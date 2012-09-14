@@ -9,4 +9,8 @@ package users;
 public class Customer extends User {
 
     String shippingAddress;
+    
+    public Customer(String username) {
+        super(username);
+    }
 }

@@ -10,4 +10,10 @@ public class Item {
 
     Integer id;
     String name;
+
+    public Item(String name) {
+        this.id = system.Auctionator.getNextItemId();
+        this.name = name;
+
+    }
 }

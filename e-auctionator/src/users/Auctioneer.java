@@ -18,6 +18,11 @@ public class Auctioneer extends User {
     private final int MAX_AUCTIONS = 10;
     private String afm;
     ArrayList<Auction> auctionsWon;
+    
+    public Auctioneer(String username) {
+        super(username);
+        
+    }
 
     public ArrayList<Auction> getAuctionsWon() {
         return auctionsWon;
