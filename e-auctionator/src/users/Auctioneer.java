@@ -5,7 +5,10 @@
 package users;
 
 import auctions.Auction;
+import auctions.Buyout;
+import auctions.Item;
 import java.util.ArrayList;
+import system.Auctionator;
 
 /**
  * Αυτή η κλαση αναπαριστά τους δημοπράτες και είναι υποκλάση της γενικότερης
@@ -27,4 +30,17 @@ public class Auctioneer extends User {
     public ArrayList<Auction> getAuctionsWon() {
         return auctionsWon;
     }
+    
+    public Auction auctionItem(Item item, String type, Double price, Auctionator auctionHouse) {
+        return auctionHouse.createAuction(item.getName(), type, item, this, price);
+        
+    }
+
+    public void setAfm(String afm) {
+        this.afm = afm;
+    }
+    
+    
+    
+    
 }

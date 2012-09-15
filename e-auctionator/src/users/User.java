@@ -1,9 +1,11 @@
 package users;
 
 import auctions.Auction;
+import auctions.Item;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import system.Mail;
 
 /**
  *
@@ -18,11 +20,16 @@ public class User {
     private String username;
     private String password;
     private ArrayList<Auction> auctions;
+    private ArrayList<Item> bags;
+    private ArrayList<Mail> mailbox;
 
     public User(String username) {
-        this.id = system.Auctionator.getNextUserId();
+        this.id = system.World.getNextUserId();
         this.username = username;
         this.password = generateRandomPassword();
+        this.auctions = new ArrayList<>();
+        this.bags = new ArrayList<>();
+        this.mailbox = new ArrayList<>();
 
     }
 
@@ -36,7 +43,7 @@ public class User {
 
     }
 
-    public String generateRandomPassword() {
+    private String generateRandomPassword() {
         SecureRandom random = new SecureRandom();
         String str = new BigInteger(130, random).toString(32);
         return str;
@@ -77,5 +84,33 @@ public class User {
         }
 
         return str;
+    }
+
+    public void receiveItem(Item item) {
+        bags.add(item);
+    }
+    
+    public void receiveMail(Mail mail) {
+        mailbox.add(mail);        
+    }
+    
+    public void openMail() {
+        Mail mail = mailbox.remove(0);
+        System.out.println(mail.getMessage());
+        if(mail.hasAttachment()) {
+            Item i = mail.getAttachment();
+            bags.add(i);
+            System.out.println("++User " + this.getUsername() + " received item " + i.getName());
+        }
+    }
+    
+    public void checkMail() {
+        if(!mailbox.isEmpty()) {
+            openMail();
+        }
+    }
+    
+    public Item getItemFromBags() {
+        return bags.remove(0);
     }
 }

@@ -8,12 +8,22 @@ package auctions;
  */
 public class Item {
 
-    Integer id;
-    String name;
+    private Integer id;
+    private String name;
 
     public Item(String name) {
-        this.id = system.Auctionator.getNextItemId();
+        this.id = system.World.getNextItemId();
         this.name = name;
 
     }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+    
+    
 }

@@ -20,16 +20,15 @@ import users.User;
  */
 public class Auctionator {
     
-    private static ArrayList<User> users;
+    //private static ArrayList<User> users;
     private static ArrayList<Auction> auctions;
-    private static ArrayList<Item> items;
+    //private static ArrayList<Item> items;
     //private static Date date;
 
-    public Auctionator(int d, int m, int y) {
-        this.users = new ArrayList<>();
-        this.auctions = new ArrayList<>();
-        this.items = new ArrayList<>();
-        AuctionCalendar.init(d, m, y);
+    public Auctionator() {
+        
+        Auctionator.auctions = new ArrayList<>();
+        
     }
     
     public void printAuctionDuration() {
@@ -42,41 +41,42 @@ public class Auctionator {
         
     }
 
-    /**
-     * This method creates a new user with a random password.
-     *
-     * @param username
-     * @param type
-     * @return Returns the created user
-     */
-    public User createUser(String username, String type) {
-        User u = null;
-        if (type.equalsIgnoreCase("auctioneer")) {
-            //Auctioneer a;
-            u = new Auctioneer(username);
-            Auctionator.users.add(u);
-            System.out.println("Νέος χρήστης με όνομα χρήστη: " + u.getUsername());
-            System.out.println("Τύπος: " + u.getType("gr"));
+    
+    public  void deactivateExpiredAuctions() {
+        for (Auction a : this.getAuctions()) {
+            Date d = a.getCreationDate();
+            Integer days = a.getDuration();
+            boolean expired = AuctionCalendar.isCurrentDateNDaysAfter(d, days - 1);
+            if (expired && a.isActive()) {
+                a.expire();
+                if(a.hasWinner()) {
+                    ship(a.getItem(), a.getWinner());
+                }
+            }
             
-        } else if (type.equalsIgnoreCase("customer")) {
-            //Customer c;
-            u = new Customer(username);
-            Auctionator.users.add(u);
-            System.out.println("Νέος χρήστης με όνομα χρήστη: " + u.getUsername());
-            System.out.println("Τύπος: " + u.getType("gr"));
-            
-        } else {
         }
-        return u;
+    }
+    
+    public void ship(Item item, User user) {
+        if(user instanceof Customer) {
+            String msg = "";
+            msg += "*~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-" + "\n";
+            msg += "| Αγαπητέ χρήστη " + user.getUsername() + "," + "\n";
+            msg += "| \n";
+            msg += "| Κερδίσατε την δημοπρασία για "  + "\n";
+            msg += "| το αντικείμενο " + item.getName() + " το οποίο " + "\n";
+            msg += "| σας αποστέλεται στην διεύθυνσή σας" + "\n";
+            msg += "| \n";
+            msg += "| Συγχαρητήρια," + "\n";
+            msg += "| Το ηλεκτρονικό σύστημα δημοπρασιών" + "\n";
+            msg += "*~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-" + "\n";
+            Mail mail = new Mail(msg);
+            mail.attach(item);
+            World.mailTo(mail, ((Customer)user).getShippingAddress());
+        }
         
     }
     
-    public Item createItem(String name) {
-        Item i = null;
-        i = new Item(name);
-        Auctionator.items.add(i);
-        return i;
-    }
 
     /**
      * This method creates a new auction.
@@ -108,27 +108,9 @@ public class Auctionator {
         return a;
     }
 
-    /**
-     * This method goes to the next day with the aid of the provided
-     * AuctionCalendar class.
-     *
-     */
-    public void advanceDay() {
-        AuctionCalendar.nextDay();
-        deactivateExpiredAuctions();
-    }
     
-    private void deactivateExpiredAuctions() {
-        for (Auction a : auctions) {
-            Date d = a.getCreationDate();
-            Integer days = a.getDuration();
-            boolean expired = AuctionCalendar.isCurrentDateNDaysAfter(d, days - 1);
-            if (expired && a.isActive()) {
-                a.expire();
-            }
-            
-        }
-    }
+    
+    
 
     /**
      * This method allows the customer to place a bid for a certain auction.
@@ -139,12 +121,25 @@ public class Auctionator {
      */
     public void placeBid(Double bid, Auction auction, User user) {
         if (user instanceof Customer) {
-            ((Customer) user).makeOffer(bid, auction);
+            ((Bid) auction).receiveOffer(bid, user);
+            //((Customer) user).makeOffer(bid, auction);
         } else if (user instanceof Auctioneer) {
             System.out.println("Προσοχή: Μονάχα οι πελάτες μπορούν να κάνουν προσφορές.");
             
         }
         
+    }
+    
+    public void sell(Auction auction, User user) {
+        if (user instanceof Customer) {
+            ((Buyout) auction).receivePurchase(user);
+            auction.close();
+            ship(auction.getItem(), auction.getWinner());
+            //((Customer) user).makeOffer(bid, auction);
+        } else if (user instanceof Auctioneer) {
+            System.out.println("Προσοχή: Μονάχα οι πελάτες μπορούν να αγοράσουν.");
+            
+        }
     }
 
     /**
@@ -165,11 +160,7 @@ public class Auctionator {
     public void printWonAuctions(Auctioneer a) {
     }
     
-    public static Integer getNextUserId() {
-        int size = Auctionator.users.size();
-        size++;
-        return size;
-    }
+    
     
     public static Integer getNextAuctionId() {
         int size = Auctionator.auctions.size();
@@ -177,15 +168,9 @@ public class Auctionator {
         return size;
     }
     
-    public static Integer getNextItemId() {
-        int size = Auctionator.items.size();
-        size++;
-        return size;
-    }
     
-    public ArrayList<User> getUsers() {
-        return users;
-    }
+    
+    
     
     public ArrayList<Auction> getAuctions() {
         return auctions;

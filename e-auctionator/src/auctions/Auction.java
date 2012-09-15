@@ -120,7 +120,50 @@ public class Auction {
     public void expire() {
         this.active = false;
         System.out.println("Auction " + this.getTitle() + " has expired!");
+        if(this instanceof Bid) {
+            if(((Bid) this).getCurrentHighestBidder() == null) {
+                this.winner = null;
+            } else {
+                this.winner = ((Bid) this).getCurrentHighestBidder();
+                this.finalPrice = ((Bid) this).getCurrentBid();
+                System.out.println("User " + this.winner.getUsername() + " won auction " + this.getTitle());
+                
+            }
+        } else if( this instanceof Buyout) {
+            //System.out.println("Auction " + this.getTitle() + " is closing");
+        }
     }
+
+    public boolean hasWinner() {
+        boolean b = false;
+        if(this.winner != null) {
+            b = true;
+        }
+        return b;
+    }
+
+    public Item getItem() {
+        return item;
+    }
+
+    public User getWinner() {
+        return winner;
+    }
+
+    public void setWinner(User winner) {
+        this.winner = winner;
+    }
+
+    public void setFinalPrice(Double finalPrice) {
+        this.finalPrice = finalPrice;
+    }
+
+    public void close() {
+        this.active = false;
+    }
+    
+    
+    
     
     
 }

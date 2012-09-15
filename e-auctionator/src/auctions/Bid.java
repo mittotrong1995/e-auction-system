@@ -11,8 +11,9 @@ import users.User;
  */
 public class Bid extends Auction {
 
-    Double startingBid;
-    Double currentBid;
+    private final Double startingBid;
+    private Double currentBid;
+    private User currentHighestBidder;
 
     public Bid(String title, Item item, User owner, Double bidPrice) {
         super(title, item, owner);
@@ -24,16 +25,30 @@ public class Bid extends Auction {
     public Double getCurrentBid() {
         return currentBid;
     }
-    
-    public void receiveOffer(Double bid) {
-        if (bid > this.currentBid) {
-            this.currentBid = bid;
-            System.out.println("Η προσφορά είναι καλύτερη από την τρέχουσα!");
+
+    public void receiveOffer(Double bid, User user) {
+        if (this.isActive()) {
+            String msg = "Ο χρήστης " + user.getUsername() + " έκανε προσφορά " + bid
+                    + " ευρώ για το " + getTitle();
+            System.out.println(msg);
+            if (bid > this.currentBid) {
+                this.currentBid = bid;
+                this.currentHighestBidder = user;
+                System.out.println("Η προσφορά είναι καλύτερη από την τρέχουσα!");
+            } else {
+                System.out.println("Η προσφορά είναι χειρότερη από την τρέχουσα!");
+            }
         } else {
-            System.out.println("Η προσφορά είναι χειρότερη από την τρέχουσα!");
+            String msg = "Ο χρήστης " + user.getUsername() + " έκανε προσφορά " 
+                    + " για το " + getTitle() + "\n";
+            msg += "Η προσφορά είναι εκπρόθεσμη";
+            System.out.println(msg);
         }
-        
+
+
     }
-    
-    
+
+    public User getCurrentHighestBidder() {
+        return currentHighestBidder;
+    }
 }

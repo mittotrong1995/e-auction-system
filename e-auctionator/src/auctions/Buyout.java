@@ -23,5 +23,20 @@ public class Buyout extends Auction {
         return buyoutPrice;
     }
     
+    public void receivePurchase(User user) {
+        if (this.isActive()) {
+            String msg = "Ο χρήστης " + user.getUsername() + " αγοράζει" 
+                    + " το " + getTitle();
+            System.out.println(msg);
+            this.setWinner(user);
+            this.setFinalPrice(buyoutPrice);
+        } else {
+            String msg = "Ο χρήστης " + user.getUsername() + " έκανε προσφορά" 
+                    + " για το " + getTitle() + "\n";
+            msg += "Η προσφορά είναι εκπρόθεσμη";
+            System.out.println(msg);
+        }
+    }
+    
     
 }
