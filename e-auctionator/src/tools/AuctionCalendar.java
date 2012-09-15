@@ -52,7 +52,7 @@ public class AuctionCalendar {
 	
 	public static void nextDay() {
 		currentDate.add(Calendar.DAY_OF_MONTH, 1);
-		System.out.println("Ç íÝá çìåñïìçíßá åßíáé : " + format.format(currentDate.getTime()));
+		System.out.println("Η νέα ημερομηνία είναι: " + format.format(currentDate.getTime()));
 	}
 	
 	public static Date getDate() {

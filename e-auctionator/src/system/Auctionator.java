@@ -5,6 +5,8 @@ import auctions.Bid;
 import auctions.Buyout;
 import auctions.Item;
 import java.util.ArrayList;
+import java.util.Date;
+import tools.AuctionCalendar;
 import users.Auctioneer;
 import users.Customer;
 import users.User;
@@ -17,16 +19,17 @@ import users.User;
  * @author Michaella Neirou
  */
 public class Auctionator {
-
-
+    
     private static ArrayList<User> users;
     private static ArrayList<Auction> auctions;
     private static ArrayList<Item> items;
-    
-    public Auctionator() {
-        users = new ArrayList<User>();
-        auctions = new ArrayList<Auction>();
-        items = new ArrayList<Item>();
+    //private static Date date;
+
+    public Auctionator(int d, int m, int y) {
+        this.users = new ArrayList<>();
+        this.auctions = new ArrayList<>();
+        this.items = new ArrayList<>();
+        AuctionCalendar.init(d, m, y);
     }
     
     public void printAuctionDuration() {
@@ -55,7 +58,7 @@ public class Auctionator {
             System.out.println("Νέος χρήστης με όνομα χρήστη: " + u.getUsername());
             System.out.println("Τύπος: " + u.getType("gr"));
             
-        } else if(type.equalsIgnoreCase("customer")) {
+        } else if (type.equalsIgnoreCase("customer")) {
             //Customer c;
             u = new Customer(username);
             Auctionator.users.add(u);
@@ -63,10 +66,9 @@ public class Auctionator {
             System.out.println("Τύπος: " + u.getType("gr"));
             
         } else {
-            
         }
         return u;
-
+        
     }
     
     public Item createItem(String name) {
@@ -94,7 +96,7 @@ public class Auctionator {
             System.out.println("Τύπος: " + a.getType("gr") + " (" + price + " ευρώ)");
             System.out.println("Η δημοπρασία " + a.getTitle() + " ανήκει στο χρήστη: " + user.getUsername());
             
-        } else if(type.equalsIgnoreCase("bid")) {
+        } else if (type.equalsIgnoreCase("bid")) {
             a = new Bid(title, item, user, price);
             Auctionator.auctions.add(a);
             System.out.println("Νέα δημοπρασία για το: " + a.getTitle());
@@ -102,7 +104,6 @@ public class Auctionator {
             System.out.println("Η δημοπρασία " + a.getTitle() + " ανήκει στο χρήστη: " + user.getUsername());
             
         } else {
-            
         }
         return a;
     }
@@ -113,15 +114,37 @@ public class Auctionator {
      *
      */
     public void advanceDay() {
+        AuctionCalendar.nextDay();
+        deactivateExpiredAuctions();
+    }
+    
+    private void deactivateExpiredAuctions() {
+        for (Auction a : auctions) {
+            Date d = a.getCreationDate();
+            Integer days = a.getDuration();
+            boolean expired = AuctionCalendar.isCurrentDateNDaysAfter(d, days - 1);
+            if (expired && a.isActive()) {
+                a.expire();
+            }
+            
+        }
     }
 
     /**
-     * This method allows to place a bid for a certain auction.
+     * This method allows the customer to place a bid for a certain auction.
      *
      * @param bid The bid price
-     * @param id The id of the auction
+     * @param auction The auction that the user wants to bid on
+     * @param user The user
      */
-    public void placeBid(Double bid, Integer id) {
+    public void placeBid(Double bid, Auction auction, User user) {
+        if (user instanceof Customer) {
+            ((Customer) user).makeOffer(bid, auction);
+        } else if (user instanceof Auctioneer) {
+            System.out.println("Προσοχή: Μονάχα οι πελάτες μπορούν να κάνουν προσφορές.");
+            
+        }
+        
     }
 
     /**
@@ -159,14 +182,12 @@ public class Auctionator {
         size++;
         return size;
     }
-
+    
     public ArrayList<User> getUsers() {
         return users;
     }
-
+    
     public ArrayList<Auction> getAuctions() {
         return auctions;
     }
-    
-    
 }

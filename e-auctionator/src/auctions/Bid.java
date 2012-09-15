@@ -11,16 +11,28 @@ import users.User;
  */
 public class Bid extends Auction {
 
-    Double bidPrice;
+    Double startingBid;
+    Double currentBid;
 
     public Bid(String title, Item item, User owner, Double bidPrice) {
         super(title, item, owner);
-        this.bidPrice = bidPrice;
+        this.startingBid = bidPrice;
+        this.currentBid = bidPrice;
 
     }
 
-    public Double getBidPrice() {
-        return bidPrice;
+    public Double getCurrentBid() {
+        return currentBid;
+    }
+    
+    public void receiveOffer(Double bid) {
+        if (bid > this.currentBid) {
+            this.currentBid = bid;
+            System.out.println("Η προσφορά είναι καλύτερη από την τρέχουσα!");
+        } else {
+            System.out.println("Η προσφορά είναι χειρότερη από την τρέχουσα!");
+        }
+        
     }
     
     
