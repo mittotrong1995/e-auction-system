@@ -24,7 +24,7 @@ public class Customer extends User {
      * @param bid The bid price
      * @param auction The auction that the user wants to bid on
      */
-    public void makeOffer(Double bid, Auction auction, system.Auctionator auctionHouse) {
+    public void makeOffer(Double bid, Auction auction, system.AuctionHouse auctionHouse) {
         if (auction instanceof Bid) {
             auctionHouse.placeBid(bid, auction, this);
             //((Bid) auction).receiveOffer(bid);
@@ -35,7 +35,7 @@ public class Customer extends User {
         }
     }
     
-    public void buy(Auction auction, system.Auctionator auctionHouse) {
+    public void buy(Auction auction, system.AuctionHouse auctionHouse) {
         if (auction instanceof Buyout) {
             auctionHouse.sell(auction, this);
             

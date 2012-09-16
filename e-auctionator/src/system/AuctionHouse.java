@@ -18,16 +18,16 @@ import users.User;
  *
  * @author Michaella Neirou
  */
-public class Auctionator {
+public class AuctionHouse {
     
     //private static ArrayList<User> users;
     private static ArrayList<Auction> auctions;
     //private static ArrayList<Item> items;
     //private static Date date;
 
-    public Auctionator() {
+    public AuctionHouse() {
         
-        Auctionator.auctions = new ArrayList<>();
+        AuctionHouse.auctions = new ArrayList<>();
         
     }
     
@@ -91,14 +91,14 @@ public class Auctionator {
         Auction a = null;
         if (type.equalsIgnoreCase("buyout")) {
             a = new Buyout(title, item, user, price);
-            Auctionator.auctions.add(a);
+            AuctionHouse.auctions.add(a);
             System.out.println("Νέα δημοπρασία για το: " + a.getTitle());
             System.out.println("Τύπος: " + a.getType("gr") + " (" + price + " ευρώ)");
             System.out.println("Η δημοπρασία " + a.getTitle() + " ανήκει στο χρήστη: " + user.getUsername());
             
         } else if (type.equalsIgnoreCase("bid")) {
             a = new Bid(title, item, user, price);
-            Auctionator.auctions.add(a);
+            AuctionHouse.auctions.add(a);
             System.out.println("Νέα δημοπρασία για το: " + a.getTitle());
             System.out.println("Τύπος: " + a.getType("gr") + " (αρχική τιμή " + price + " ευρώ)");
             System.out.println("Η δημοπρασία " + a.getTitle() + " ανήκει στο χρήστη: " + user.getUsername());
@@ -134,6 +134,7 @@ public class Auctionator {
         if (user instanceof Customer) {
             ((Buyout) auction).receivePurchase(user);
             auction.close();
+            user.addWonAuction(auction);
             ship(auction.getItem(), auction.getWinner());
             //((Customer) user).makeOffer(bid, auction);
         } else if (user instanceof Auctioneer) {
@@ -163,9 +164,16 @@ public class Auctionator {
     
     
     public static Integer getNextAuctionId() {
-        int size = Auctionator.auctions.size();
+        int size = AuctionHouse.auctions.size();
         size++;
         return size;
+    }
+    
+    public void printAuctions() {
+        String str = "";
+        for (Auction auction : auctions) {
+            auction.print();
+        }
     }
     
     

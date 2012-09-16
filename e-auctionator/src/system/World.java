@@ -15,14 +15,15 @@ import users.User;
  */
 public class World {
 
+    public static boolean SYSTEM_MESSAGES = true;
     private static ArrayList<User> users;
     private static ArrayList<Item> items;
-    private Auctionator auctionHouse;
+    private AuctionHouse auctionHouse;
 
     public World(int d, int m, int y) {
         this.users = new ArrayList<>();
         this.items = new ArrayList<>();
-        this.auctionHouse = new Auctionator();
+        this.auctionHouse = new AuctionHouse();
         AuctionCalendar.init(d, m, y);
     }
 
@@ -96,7 +97,7 @@ public class World {
         return users;
     }
 
-    public Auctionator getAuctionHouse() {
+    public AuctionHouse getAuctionHouse() {
         return auctionHouse;
     }
 
@@ -118,6 +119,8 @@ public class World {
 
     private static void mail(Mail mail, User user) {
         user.receiveMail(mail);
-        System.out.println("++Mail sent to " + user.getUsername());
+        if (SYSTEM_MESSAGES) {
+            System.out.println("++Mail sent to " + user.getUsername());
+        }
     }
 }

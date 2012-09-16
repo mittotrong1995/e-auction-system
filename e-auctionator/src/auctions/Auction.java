@@ -1,8 +1,10 @@
 package auctions;
 
 import java.util.Date;
-import system.Auctionator;
+import system.AuctionHouse;
+import system.World;
 import tools.AuctionCalendar;
+import users.Auctioneer;
 import users.User;
 
 /**
@@ -24,7 +26,7 @@ public class Auction {
     private Date creationDate;
 
     public Auction(String title, Item item, User owner) {
-        this.id = Auctionator.getNextAuctionId();
+        this.id = AuctionHouse.getNextAuctionId();
         this.title = title;
         this.item = item;
         this.owner = owner;
@@ -119,24 +121,29 @@ public class Auction {
 
     public void expire() {
         this.active = false;
-        System.out.println("Auction " + this.getTitle() + " has expired!");
-        if(this instanceof Bid) {
-            if(((Bid) this).getCurrentHighestBidder() == null) {
+        if (World.SYSTEM_MESSAGES) {
+            System.out.println("++Auction " + this.getTitle() + " has expired!");
+        }
+        if (this instanceof Bid) {
+            if (((Bid) this).getCurrentHighestBidder() == null) {
                 this.winner = null;
             } else {
                 this.winner = ((Bid) this).getCurrentHighestBidder();
                 this.finalPrice = ((Bid) this).getCurrentBid();
-                System.out.println("User " + this.winner.getUsername() + " won auction " + this.getTitle());
-                
+                this.winner.addWonAuction(this);
+                if (World.SYSTEM_MESSAGES) {
+                    System.out.println("++User " + this.winner.getUsername() + " won auction " + this.getTitle());
+                }
+
             }
-        } else if( this instanceof Buyout) {
+        } else if (this instanceof Buyout) {
             //System.out.println("Auction " + this.getTitle() + " is closing");
         }
     }
 
     public boolean hasWinner() {
         boolean b = false;
-        if(this.winner != null) {
+        if (this.winner != null) {
             b = true;
         }
         return b;
@@ -161,9 +168,32 @@ public class Auction {
     public void close() {
         this.active = false;
     }
-    
-    
-    
-    
-    
+
+    public void show() {
+        String str = "";
+        if (this instanceof Buyout) {
+            str += "| " + this.getTitle() + " - " + this.getType("gr") + " - " + ((Buyout) this).getBuyoutPrice() + " ευρώ";
+        } else if (this instanceof Bid) {
+            str += "| " + this.getTitle() + " - " + this.getType("gr") + " - " + ((Bid) this).getCurrentBid() + " ευρώ";
+        }
+        System.out.println(str);
+    }
+
+    public void print() {
+        String str = "";
+        String active = "Ανενεργή";
+        if (this.isActive()) {
+            active = "Ενεργή";
+        }
+        String winner = "Χωρίς νικητή";
+        if (this.winner != null) {
+            winner = "Νικητής ο " + this.getWinner().getUsername();
+        }
+        if (this instanceof Buyout) {
+            str += this.getTitle() + " - " + active + " - " + winner;
+        } else if (this instanceof Bid) {
+            str += this.getTitle() + " - " + active + " - " + winner + " (" + ((Bid) this).getCurrentBid() + " ευρώ)";
+        }
+        System.out.println(str);
+    }
 }

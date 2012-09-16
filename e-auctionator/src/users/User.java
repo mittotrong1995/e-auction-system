@@ -20,6 +20,7 @@ public class User {
     private String username;
     private String password;
     private ArrayList<Auction> auctions;
+    private ArrayList<Auction> auctionsWon;
     private ArrayList<Item> bags;
     private ArrayList<Mail> mailbox;
 
@@ -28,6 +29,7 @@ public class User {
         this.username = username;
         this.password = generateRandomPassword();
         this.auctions = new ArrayList<>();
+        this.auctionsWon = new ArrayList<>();
         this.bags = new ArrayList<>();
         this.mailbox = new ArrayList<>();
 
@@ -60,8 +62,6 @@ public class User {
     public String getPassword() {
         return password;
     }
-    
-    
 
     public String getType(String lang) {
         String str = "";
@@ -89,28 +89,64 @@ public class User {
     public void receiveItem(Item item) {
         bags.add(item);
     }
-    
+
     public void receiveMail(Mail mail) {
-        mailbox.add(mail);        
+        mailbox.add(mail);
     }
-    
+
     public void openMail() {
         Mail mail = mailbox.remove(0);
         System.out.println(mail.getMessage());
-        if(mail.hasAttachment()) {
+        if (mail.hasAttachment()) {
             Item i = mail.getAttachment();
             bags.add(i);
             System.out.println("++User " + this.getUsername() + " received item " + i.getName());
         }
     }
-    
+
     public void checkMail() {
-        if(!mailbox.isEmpty()) {
+        if (!mailbox.isEmpty()) {
             openMail();
         }
     }
-    
+
     public Item getItemFromBags() {
-        return bags.remove(0);
+        Item i = null;
+        if (bags.size() != 0) {
+            i = bags.remove(0);
+        } else {
+            System.out.println("Warning(" + this.getUsername() + "): No more items in bags!");
+        }
+        return i;
+    }
+
+    public ArrayList<Auction> getAuctions() {
+        return this.auctions;
+    }
+
+    public void addAuction(Auction auction) {
+        this.auctions.add(auction);
+    }
+
+    public void addWonAuction(Auction auction) {
+        this.auctionsWon.add(auction);
+    }
+
+    public int getAuctionsNumber() {
+        return this.auctions.size();
+    }
+
+    public int getActiveAuctionsNumber() {
+        int i = 0;
+        for (Auction auction : auctions) {
+            if (auction.isActive()) {
+                i++;
+            }
+        }
+        return i;
+    }
+
+    public ArrayList<Auction> getAuctionsWon() {
+        return auctionsWon;
     }
 }
